@@ -1,0 +1,50 @@
+pipeline {
+    agent any
+        environment {
+            DOCKER_IMAGE = "hemanathan18/devops-python-app"
+        }
+        stages {
+            stage ('Checkout') {
+                steps {
+                    git 'https://github.com/Hemanathan-N/DevOps-Project.git'
+                    sh 'cd Jenkins-ci-cd-project'
+                }
+            }
+            stage ('Run Tests') {
+                steps {
+                    sh '''
+                    cd Jenkins-ci-cd-project
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    pip install --upgrade pip
+                    pip install -r requirements.txt
+                    pytest || true
+                    '''
+                }
+            }
+            stage('Build Docker Image') {
+            steps {
+                sh '''
+                cd Jenkins-ci-cd-project
+                docker build -t $DOCKER_IMAGE:latest .
+                '''
+            }
+        }
+            stage('Push to Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'DockerHub', passwordVariable: 'docker_pwd', usernameVariable: 'docker_un')]) {
+                    sh 'docker login -u ${docker_un} -p ${docker_pwd}' }
+                    sh 'docker push $DOCKER_IMAGE:latest'
+            }
+        }
+            stage('Deploy to EC2') {
+            steps {
+                sh '''
+                docker stop python-app || true
+                docker rm python-app || true
+                docker run -d -p 80:5000 --name python-app $DOCKER_IMAGE:latest
+                '''
+            }
+        }
+    }
+}
