@@ -99,7 +99,7 @@ resource "aws_instance" "web1" {
     subnet_id                   = aws_subnet.public-subnet1.id
     key_name                    = "AWS-Demo"
     associate_public_ip_address = "true"
-    security_groups             = [aws_security_group.sg1.id]
+    vpc_security_group_ids      = [aws_security_group.sg1.id]
 
     tags = {
         Name = "${var.client-name}-web1"
@@ -113,7 +113,7 @@ resource "aws_instance" "db1" {
     subnet_id                   = aws_subnet.private-subnet1.id
     key_name                    = "AWS-Demo"
     associate_public_ip_address = "false"
-    security_groups             = [aws_security_group.sg1.id]
+    vpc_security_group_ids      = [aws_security_group.sg1.id]
 
     tags = {
         Name = "${var.client-name}-db1"
@@ -122,13 +122,11 @@ resource "aws_instance" "db1" {
 }
 
 output "web1-public-ip" {
-    value = aws_instance.web1.public_ip
+    value = aws_instance.web1.public_ip 
 }
-
 output "web1-private-ip" {
     value = aws_instance.web1.private_ip
 }
-
 output "db1-private-ip" {
     value = aws_instance.db1.private_ip
 }
