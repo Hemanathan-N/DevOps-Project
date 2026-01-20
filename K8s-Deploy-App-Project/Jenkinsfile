@@ -28,10 +28,12 @@ pipeline {
                 credentialsId: 'DockerHub', 
                 passwordVariable: 'docker_pwd', 
                 usernameVariable: 'docker_un')])  {
-                    sh '''
-                    docker login -u ${docker_un} -p ${docker_pwd}
-                    docker push $IMAGE_NAME:latest  
-                    '''
+                    dir('K8s-Deploy-App-Project') {
+                        sh '''
+                        docker login -u ${docker_un} -p ${docker_pwd}
+                        docker push $IMAGE_NAME:latest  
+                        ''' 
+                    }
                 }
             }
         }
@@ -44,9 +46,13 @@ pipeline {
                 kubectl get nodes
                 kubectl get deployments
                 kubectl get services
-                kubectl apply -f deployment.yaml
-                kubectl apply -f service.yaml
                 '''
+                dir('K8s-Deploy-App-Project/k8s') {
+                    sh '''
+                    kubectl apply -f deployment.yaml
+                    kubectl apply -f service.yaml
+                    ''' 
+                }
             }
         }
     }
