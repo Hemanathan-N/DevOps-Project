@@ -20,5 +20,6 @@ spec:
       containers:
       - name: employee-app
         image: hemanathan18/employee-app:v1
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 5000
