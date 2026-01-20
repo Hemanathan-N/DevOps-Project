@@ -1,27 +1,29 @@
 pipeline {
     agent any
-        environment {
-            DOCKER_IMAGE = "hemanathan18/devops-python-app"
+    environment {
+        DOCKER_IMAGE = "hemanathan18/devops-python-app"
+    }
+    stages {
+        stage ('Checkout') {
+            steps {
+                git 'https://github.com/Hemanathan-N/DevOps-Project.git'
+            }
         }
-        stages {
-            stage ('Checkout') {
-                steps {
-                    git 'https://github.com/Hemanathan-N/DevOps-Project.git'
-                }
+        
+        stage ('Run Tests') {
+            steps {
+                sh '''
+                cd Jenkins-CICD-Project
+                python3 -m venv venv
+                . venv/bin/activate
+                pip install --upgrade pip
+                pip install -r requirements.txt
+                pytest || true
+                '''
             }
-            stage ('Run Tests') {
-                steps {
-                    sh '''
-                    cd Jenkins-CICD-Project
-                    python3 -m venv venv
-                    . venv/bin/activate
-                    pip install --upgrade pip
-                    pip install -r requirements.txt
-                    pytest || true
-                    '''
-                }
-            }
-            stage('Build Docker Image') {
+        }
+        
+        stage('Build Docker Image') {
             steps {
                 sh '''
                 cd Jenkins-CICD-Project
@@ -29,14 +31,21 @@ pipeline {
                 '''
             }
         }
-            stage('Push to Docker Hub') {
+        
+        stage('Push to Docker Hub') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'DockerHub', passwordVariable: 'docker_pwd', usernameVariable: 'docker_un')]) {
-                    sh 'docker login -u ${docker_un} -p ${docker_pwd}' }
-                    sh 'docker push $DOCKER_IMAGE:latest'
+                withCredentials([usernamePassword(
+                credentialsId: 'DockerHub', 
+                passwordVariable: 'docker_pwd', 
+                usernameVariable: 'docker_un')]) {
+                    sh '''
+                    docker login -u ${docker_un} -p ${docker_pwd}
+                    docker push $DOCKER_IMAGE:latest
+                    '''
+                }
             }
         }
-            stage('Deploy to EC2') {
+        stage('Deploy to EC2') {
             steps {
                 sh '''
                 docker stop python-app || true
