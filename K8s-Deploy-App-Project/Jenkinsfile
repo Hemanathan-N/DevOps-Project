@@ -1,0 +1,51 @@
+pipeline {
+    agent any
+
+    environment {
+        IMAGE_NAME = "hemanathan18/employee-app"
+        KUBE_CONFIG = "/var/lib/jenkins/.kube/config"
+    }
+
+    stages {
+
+        stage('Checkout Code') {
+            steps {
+                git 'https://github.com/Hemanathan-N/DevOps-Project.git'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t $IMAGE_NAME:latest .'
+            }
+        }
+
+        stage('Push Image to DockerHub') {
+            steps {
+                withCredentials([usernamePassword(
+                credentialsId: 'DockerHub', 
+                passwordVariable: 'docker_pwd', 
+                usernameVariable: 'docker_un')])  {
+                    sh '''
+                    docker login -u ${docker_un} -p ${docker_pwd}
+                    docker push $IMAGE_NAME:latest  
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh '''
+                minikube start --driver=docker --memory=2048 --cpus=2
+                minikube status
+                kubectl get nodes
+                kubectl get deployments
+                kubectl get services
+                kubectl apply -f deployment.yaml
+                kubectl apply -f service.yaml
+                '''
+            }
+        }
+    }
+}
