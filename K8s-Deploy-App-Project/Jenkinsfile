@@ -40,17 +40,13 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             steps {
-                sh '''
-                minikube start --driver=docker --memory=2048 --cpus=2
-                minikube status
-                kubectl get nodes
-                kubectl get deployments
-                kubectl get services
-                '''
                 dir('K8s-Deploy-App-Project/k8s') {
                     sh '''
-                    kubectl apply -f deployment.yaml
-                    kubectl apply -f service.yaml
+                    minikube start --driver=docker --memory=2048 --cpus=2
+                    minikube status
+                    kubectl get nodes
+                    kubectl apply -f deployment.yml
+                    kubectl apply -f service.yml
                     ''' 
                 }
             }
