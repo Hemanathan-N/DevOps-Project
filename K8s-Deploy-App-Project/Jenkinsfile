@@ -16,7 +16,9 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $IMAGE_NAME:latest .'
+                dir('K8s-Deploy-App-Project') {
+                    sh 'docker build -t $IMAGE_NAME:latest .'
+                }
             }
         }
 
