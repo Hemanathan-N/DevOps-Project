@@ -50,6 +50,8 @@ pipeline {
             steps {
                 dir('Jenkins-CICD-Project') {
                 sh '''
+                #ssh -o StrictHostKeyChecking=no ec2-user@<EC2_PUBLIC_IP> << EOF
+                #docker pull $DOCKER_IMAGE:latest
                 docker stop python-app || true
                 docker rm python-app || true
                 docker run -d -p 5000:5000 --name python-app $DOCKER_IMAGE:latest
