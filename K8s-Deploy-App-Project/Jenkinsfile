@@ -37,7 +37,6 @@ pipeline {
             steps {
                 dir('K8s-Deploy-App-Project/k8s') {
                     sh '''
-                    bash script.sh
                     kubectl get nodes
                     kubectl apply -f deployment.yml
                     kubectl apply -f service.yml
