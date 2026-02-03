@@ -58,20 +58,20 @@ pipeline {
             }
         }
     }
-         post {
-            success {
-                emailext(
-                    subject: "Jenkins Build Successful !",
-                    body: "Jenkins CICD-Project-pipeline completed successfully.",
-                    to: "hemeenufradus18180@gmail.com" 
-                ) 
-            }
-            failure {
-                emailext(
-                    subject: "Jenkins Build Failed !!",
-                    body: "Jenkins CICD-Project-pipeline failed. Please check logs.",
-                    to: "hemeenufradus18180@gmail.com"
-                )
-            }
+    post {
+        success {
+            emailext(
+                subject: "Jenkins Build Successful !",
+                body: "Jenkins CICD-Project-pipeline completed successfully.",
+                to: "hemeenufradus18180@gmail.com" 
+            ) 
         }
+        failure {
+            emailext(
+                subject: "Jenkins Build Failed !!",
+                body: "Jenkins CICD-Project-pipeline failed. Please check logs.",
+                to: "hemeenufradus18180@gmail.com"
+            )
+        }
+    }
 }
